@@ -60,13 +60,16 @@ flutter:
   assets:
     - assets/iphone_mini_1/Group1.png
     - assets/iphone_mini_1/Group2.png
-    - assets/iphone_mini_1/Group3.png
+    - assets/iphone_mini_1/iphone_mini_1.JPG
     - assets/iphone_mini_1/setting.png
     - assets/iphone_mini_1/ads.png
     - assets/iphone_mini_1/share_button.png
     - assets/iphone_mini_1/start_button.png
-    - assets/iphone_mini_2/bigcloud.png
+    - assets/iphone_mini_2/iphone_mini_2.JPG
     - assets/iphone_mini_2/back_button.png
+    - assets/iphone_mini_7/iphone_mini_7.png
+    - assets/iphone_mini_7/idea.png
+    - assets/iphone_mini_7/shuffle.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 

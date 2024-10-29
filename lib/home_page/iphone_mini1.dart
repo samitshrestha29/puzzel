@@ -5,76 +5,67 @@ class IphoneMini1 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        height: double.infinity,
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFF7B4BFA),
-              Color(0xFF3A076C),
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: Stack(
-          clipBehavior: Clip.none,
-          alignment: Alignment.bottomCenter,
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenwidth = MediaQuery.of(context).size.width;
+    return MaterialApp(
+      home: Scaffold(
+        body: Column(
           children: [
-            Positioned(
-              top: 40,
-              left: 16,
-              right: 16,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Ads icon
-                  Image.asset(
-                    'assets/iphone_mini_1/ads.png',
-                    fit: BoxFit.contain,
-                  ),
-                  Image.asset(
-                    'assets/iphone_mini_1/setting.png',
-                    fit: BoxFit.contain,
-                  ),
-                ],
-              ),
-            ),
-            const Positioned(
-              top: 0,
-              child: Image(
-                image: AssetImage('assets/iphone_mini_1/Group2.png'),
-              ),
-            ),
-            Positioned(
-              bottom: MediaQuery.of(context).size.height / 1.7,
-              child: const Image(
-                fit: BoxFit.contain,
-                image: AssetImage('assets/iphone_mini_1/Group1.png'),
-              ),
-            ),
-            Positioned(
-              child: Image(
-                fit: BoxFit.cover,
-                image: const AssetImage('assets/iphone_mini_1/Group3.png'),
-                height: MediaQuery.of(context).size.height / 2.2,
-                width: MediaQuery.of(context).size.width,
-              ),
-            ),
-            Positioned(
-              top: MediaQuery.of(context).size.height / 1.35,
-              child: const Image(
-                fit: BoxFit.cover,
-                image: AssetImage('assets/iphone_mini_1/start_button.png'),
-              ),
-            ),
-            Positioned(
-              top: MediaQuery.of(context).size.height / 1.2,
-              child: const Image(
-                fit: BoxFit.cover,
-                image: AssetImage('assets/iphone_mini_1/share_button.png'),
+            Expanded(
+              child: Center(
+                child: Stack(
+                  children: [
+                    Image.asset(
+                      'assets/iphone_mini_1/iphone_mini_1.JPG', // Replace with your image asset path
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                    ),
+                    Positioned(
+                      bottom: MediaQuery.of(context).size.height / 1.8,
+                      left: MediaQuery.of(context).size.width / 12,
+                      child: const Image(
+                        image: AssetImage('assets/iphone_mini_1/Group1.png'),
+                      ),
+                    ),
+                    Positioned(
+                      top: screenHeight / 15,
+                      left: screenwidth / 50,
+                      child: Image.asset(
+                        'assets/iphone_mini_1/ads.png',
+                        width: 50,
+                        height: 50,
+                      ),
+                    ),
+                    Positioned(
+                      top: screenHeight / 15,
+                      right: screenwidth / 30,
+                      child: Image.asset(
+                        'assets/iphone_mini_1/setting.png', // Replace with your setting image asset path
+                        width: 50,
+                        height: 50,
+                      ),
+                    ),
+                    Positioned(
+                      top: MediaQuery.of(context).size.height / 1.40,
+                      left: MediaQuery.of(context).size.width / 3.5,
+                      child: const Image(
+                        fit: BoxFit.cover,
+                        image:
+                            AssetImage('assets/iphone_mini_1/start_button.png'),
+                      ),
+                    ),
+                    Positioned(
+                      top: MediaQuery.of(context).size.height / 1.2,
+                      left: MediaQuery.of(context).size.width / 3.5,
+                      child: const Image(
+                        fit: BoxFit.cover,
+                        image:
+                            AssetImage('assets/iphone_mini_1/share_button.png'),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

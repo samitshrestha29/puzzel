@@ -9,107 +9,94 @@ class IphoneMini2 extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      body: Container(
-        height: double.infinity,
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFFF6AE36),
-              Color(0xFFBB9F00),
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+      body: Stack(
+        children: [
+          Image.asset(
+            'assets/iphone_mini_2/iphone_mini_2.JPG',
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: double.infinity,
           ),
-        ),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            // Back button
-            Positioned(
-              top: screenHeight * 0.08, // Position based on screen height
-              left: screenWidth * 0.05, // Position based on screen width
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Image(
-                  image: AssetImage('assets/iphone_mini_2/back_button.png'),
-                  height: 100,
-                  width: 30,
-                ),
+          // Back Button positioned to the top-left corner
+          Positioned(
+            top: screenHeight * 0.05,
+            left: screenWidth * 0.05,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.of(context).pop();
+              },
+              child: const Image(
+                image: AssetImage('assets/iphone_mini_2/back_button.png'),
+                height: 50,
+                width: 30,
               ),
             ),
+          ),
 
-            // Cloud image at the bottom
-            Positioned(
-              bottom: 0,
-              child: Image.asset(
-                'assets/iphone_mini_2/bigcloud.png',
-                width: screenWidth,
-                fit: BoxFit.fitWidth,
-              ),
-            ),
-
-            // Title
-            Positioned(
-              top: screenHeight * 0.16, // Adjust based on screen height
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: screenWidth * 0.02,
-                  vertical: screenHeight * 0.01,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                      color: const Color.fromARGB(255, 194, 119, 5), width: 4),
-                ),
-                child: Text(
-                  'Choose Bible Category',
-                  style: TextStyle(
-                    fontSize: screenHeight * 0.025, // Responsive font size
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+          Column(
+            children: [
+              Center(
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: screenWidth * 0.05,
+                    vertical: screenHeight * 0.01,
+                  ),
+                  margin: EdgeInsets.only(
+                      top: screenHeight * 0.12, bottom: screenHeight * 0.02),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: const Color.fromARGB(255, 194, 119, 5),
+                      width: 4,
+                    ),
+                  ),
+                  child: Text(
+                    'Choose Bible Category',
+                    style: TextStyle(
+                      fontSize: screenHeight * 0.025,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
                 ),
               ),
-            ),
-
-            // Grid of Category Buttons
-            Positioned(
-              top: screenHeight / 2.5,
-              child: SizedBox(
-                width: screenWidth * 0.9,
-                child: GridView.count(
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  crossAxisCount: 2,
-                  mainAxisSpacing: screenHeight * 0.02,
-                  crossAxisSpacing: screenWidth * 0.05,
-                  childAspectRatio: 3,
-                  children: const [
-                    CategoryButton(label: 'Comforting'),
-                    CategoryButton(label: 'Courage'),
-                    CategoryButton(label: 'Faith-In-Hard-Times'),
-                    CategoryButton(label: 'Forgiveness'),
-                    CategoryButton(label: 'Friendship'),
-                    CategoryButton(label: 'God\'s Promises'),
-                    CategoryButton(label: 'Happiness'),
-                    CategoryButton(label: 'Healing'),
-                    CategoryButton(label: 'Hope'),
-                    CategoryButton(label: 'Love'),
-                    CategoryButton(label: 'Motivational'),
-                    CategoryButton(label: 'Peace'),
-                    CategoryButton(label: 'Prayers'),
-                    CategoryButton(label: 'Protection'),
-                    CategoryButton(label: 'Thankful'),
-                  ],
+              const SizedBox(
+                height: 80,
+              ),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: screenWidth * 0.05,
+                  ),
+                  child: GridView.count(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: screenHeight * 0.01,
+                    crossAxisSpacing: screenWidth * 0.05,
+                    childAspectRatio: 2.5,
+                    children: const [
+                      CategoryButton(label: 'Comforting'),
+                      CategoryButton(label: 'Courage'),
+                      CategoryButton(label: 'Faith-In-Hard-Times'),
+                      CategoryButton(label: 'Forgiveness'),
+                      CategoryButton(label: 'Friendship'),
+                      CategoryButton(label: 'God\'s Promises'),
+                      CategoryButton(label: 'Happiness'),
+                      CategoryButton(label: 'Healing'),
+                      CategoryButton(label: 'Hope'),
+                      CategoryButton(label: 'Love'),
+                      CategoryButton(label: 'Motivational'),
+                      CategoryButton(label: 'Peace'),
+                      CategoryButton(label: 'Prayers'),
+                      CategoryButton(label: 'Protection'),
+                      CategoryButton(label: 'Thankful'),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -125,9 +112,8 @@ class CategoryButton extends StatelessWidget {
     final screenHeight = MediaQuery.of(context).size.height;
     double fontSize = screenHeight * 0.025;
 
-    // Reduce font size for longer labels
     if (label.length > 10) {
-      fontSize *= 0.85; // adjust the scale as needed
+      fontSize *= 0.80;
     }
 
     return ElevatedButton(
@@ -145,7 +131,6 @@ class CategoryButton extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Outline text for label
           Text(
             label,
             style: TextStyle(
@@ -158,7 +143,6 @@ class CategoryButton extends StatelessWidget {
             ),
             textAlign: TextAlign.center,
           ),
-          // Main white text with shadow
           Text(
             label,
             style: TextStyle(
