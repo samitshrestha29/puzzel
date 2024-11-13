@@ -1,3 +1,5 @@
+import 'package:bible_puzzle_game/home_page/iphone_mini4.dart';
+
 import 'package:flutter/material.dart';
 
 class IphoneMini2 extends StatelessWidget {
@@ -32,7 +34,6 @@ class IphoneMini2 extends StatelessWidget {
               ),
             ),
           ),
-
           Column(
             children: [
               Center(
@@ -74,22 +75,31 @@ class IphoneMini2 extends StatelessWidget {
                     mainAxisSpacing: screenHeight * 0.01,
                     crossAxisSpacing: screenWidth * 0.05,
                     childAspectRatio: 2.5,
-                    children: const [
-                      CategoryButton(label: 'Comforting'),
-                      CategoryButton(label: 'Courage'),
-                      CategoryButton(label: 'Faith-In-Hard-Times'),
-                      CategoryButton(label: 'Forgiveness'),
-                      CategoryButton(label: 'Friendship'),
-                      CategoryButton(label: 'God\'s Promises'),
-                      CategoryButton(label: 'Happiness'),
-                      CategoryButton(label: 'Healing'),
-                      CategoryButton(label: 'Hope'),
-                      CategoryButton(label: 'Love'),
-                      CategoryButton(label: 'Motivational'),
-                      CategoryButton(label: 'Peace'),
-                      CategoryButton(label: 'Prayers'),
-                      CategoryButton(label: 'Protection'),
-                      CategoryButton(label: 'Thankful'),
+                    children: [
+                      CategoryButton(
+                          label: 'Comforting',
+                          onPressed: () {
+                            // Navigate to IphoneMini4 when "Comforting" is clicked
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                  builder: (_) => const IphoneMini4()),
+                            );
+                          }),
+                      // Other CategoryButton instances remain the same
+                      const CategoryButton(label: 'Courage'),
+                      const CategoryButton(label: 'Faith-In-Hard-Times'),
+                      const CategoryButton(label: 'Forgiveness'),
+                      const CategoryButton(label: 'Friendship'),
+                      const CategoryButton(label: 'God\'s Promises'),
+                      const CategoryButton(label: 'Happiness'),
+                      const CategoryButton(label: 'Healing'),
+                      const CategoryButton(label: 'Hope'),
+                      const CategoryButton(label: 'Love'),
+                      const CategoryButton(label: 'Motivational'),
+                      const CategoryButton(label: 'Peace'),
+                      const CategoryButton(label: 'Prayers'),
+                      const CategoryButton(label: 'Protection'),
+                      const CategoryButton(label: 'Thankful'),
                     ],
                   ),
                 ),
@@ -104,8 +114,9 @@ class IphoneMini2 extends StatelessWidget {
 
 class CategoryButton extends StatelessWidget {
   final String label;
+  final VoidCallback? onPressed;
 
-  const CategoryButton({required this.label, super.key});
+  const CategoryButton({required this.label, this.onPressed, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +128,7 @@ class CategoryButton extends StatelessWidget {
     }
 
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: onPressed ?? () {},
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.orange,
         padding: EdgeInsets.symmetric(

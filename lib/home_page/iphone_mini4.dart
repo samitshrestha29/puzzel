@@ -1,12 +1,48 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:bible_puzzle_game/home_page/game.dart';
 
-class IphoneMini4 extends StatelessWidget {
+class IphoneMini4 extends StatefulWidget {
   const IphoneMini4({super.key});
 
   @override
+  _IphoneMini4State createState() => _IphoneMini4State();
+}
+
+class _IphoneMini4State extends State<IphoneMini4> {
+  static const int totalLevels = 20;
+  List<bool> levelCompletionStatus =
+      List.generate(totalLevels, (index) => false);
+  List<dynamic> levelsData = [];
+  int currentLevel = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    loadLevelData();
+  }
+
+  Future<void> loadLevelData() async {
+    final String jsonString =
+        await rootBundle.loadString('assets/level_data.json');
+    final data = json.decode(jsonString);
+    setState(() {
+      levelsData = data['levels'];
+    });
+  }
+
+  void completeLevel(int levelIndex) {
+    setState(() {
+      levelCompletionStatus[levelIndex] = true;
+      if (levelIndex < totalLevels - 1) {
+        currentLevel = levelIndex + 1; // Unlock next level
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    const int totalLevels = 40;
-    const int unlockedLevels = 8;
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
@@ -19,7 +55,6 @@ class IphoneMini4 extends StatelessWidget {
             width: double.infinity,
             height: double.infinity,
           ),
-
           Positioned(
             top: screenHeight * 0.05,
             left: screenWidth * 0.05,
@@ -34,8 +69,6 @@ class IphoneMini4 extends StatelessWidget {
               ),
             ),
           ),
-
-          // Fixed Header and Scrollable Grid
           Column(
             children: [
               Center(
@@ -63,33 +96,52 @@ class IphoneMini4 extends StatelessWidget {
                   ),
                 ),
               ),
-              // SizedBox to create space below the header
               SizedBox(height: screenHeight * 0.15),
-
-              // Scrollable Grid for Levels
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: GridView.builder(
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 5, // Number of buttons per row
+                      crossAxisCount: 5,
                       crossAxisSpacing: 8.0,
                       mainAxisSpacing: 8.0,
                     ),
                     itemCount: totalLevels,
                     itemBuilder: (context, index) {
                       final level = index + 1;
-                      bool isUnlocked = level <= unlockedLevels;
+                      final isCompleted = levelCompletionStatus[index];
+                      final isCurrentLevel = index == currentLevel;
+                      final isUnlocked = index <= currentLevel || isCompleted;
+                      final color = isCompleted
+                          ? Colors.green
+                          : isCurrentLevel
+                              ? Colors.blue
+                              : Colors.orange;
 
                       return ElevatedButton(
-                        onPressed:
-                            isUnlocked ? () {} : null, // Disable if locked
+                        onPressed: isUnlocked && index < levelsData.length
+                            ? () async {
+                                final isLevelCompleted = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Game(
+                                      level:
+                                          level, // Pass the level number here
+                                      levelData: levelsData[index],
+                                      onLevelComplete: () =>
+                                          completeLevel(index),
+                                    ),
+                                  ),
+                                );
+                                if (isLevelCompleted == true) {
+                                  completeLevel(index);
+                                }
+                              }
+                            : null,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors
-                              .orange, // Orange background for all buttons
-                          disabledBackgroundColor:
-                              Colors.orange, // Orange even if disabled
+                          backgroundColor: color,
+                          disabledBackgroundColor: Colors.orange,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),

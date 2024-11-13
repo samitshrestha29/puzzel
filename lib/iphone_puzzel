@@ -1,0 +1,328 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const WordSearchGame());
+}
+
+class WordSearchGame extends StatelessWidget {
+  const WordSearchGame({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      home: SelectWidget(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class SelectWidget extends StatelessWidget {
+  const SelectWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Select Category')),
+      body: Center(
+        child: ElevatedButton(
+          child: const Text('Start Game'),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const GameWidget()),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class GameWidget extends StatefulWidget {
+  const GameWidget({super.key});
+
+  @override
+  _GameWidgetState createState() => _GameWidgetState();
+}
+
+class _GameWidgetState extends State<GameWidget>
+    with SingleTickerProviderStateMixin {
+  final List<String> words = ['BIRD', 'BUG', 'CLOUD', 'DRAGON', 'KITE', 'TIME'];
+  final List<List<String>> grid = [
+    ['C', 'P', 'K', 'I', 'T', 'E'],
+    ['L', 'B', 'T', 'I', 'M', 'E'],
+    ['O', 'D', 'I', 'B', 'C', 'M'],
+    ['U', 'A', 'X', 'R', 'U', 'S'],
+    ['D', 'O', 'C', 'E', 'D', 'G'],
+    ['N', 'O', 'G', 'A', 'R', 'D'],
+  ];
+
+  List<String> foundWords = [];
+  List<Offset> selectedIndices = [];
+  String currentSelection = "";
+  Offset? initialDirection;
+  final Color correctColor = Colors.green;
+  Map<Offset, Color> cellColors = {};
+  Map<String, Color> wordColors = {};
+  Map<Offset, bool> lockedCells = {};
+  List<Line> lines = [];
+
+  late AnimationController _controller;
+  Offset? startPoint, endPoint;
+  bool showLine = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void startSelection(int row, int col) {
+    Offset startPos = Offset(row.toDouble(), col.toDouble());
+    if (lockedCells[startPos] == true) return;
+
+    setState(() {
+      selectedIndices = [startPos];
+      currentSelection = grid[row][col];
+      initialDirection = null;
+      startPoint = Offset(col.toDouble(), row.toDouble());
+      endPoint = startPoint;
+      showLine = true; // Show line as soon as selection starts
+      _controller.reset();
+      _controller.forward();
+    });
+  }
+
+  void updateSelection(int row, int col) {
+    Offset newPos = Offset(row.toDouble(), col.toDouble());
+    if (lockedCells[newPos] == true) return;
+
+    if (selectedIndices.length == 1) {
+      int dRow = row - selectedIndices[0].dx.toInt();
+      int dCol = col - selectedIndices[0].dy.toInt();
+      if ((dRow.abs() == 1 && dCol == 0) ||
+          (dCol.abs() == 1 && dRow == 0) ||
+          (dRow.abs() == 1 && dCol.abs() == 1)) {
+        initialDirection = Offset(dRow.toDouble(), dCol.toDouble());
+      } else {
+        return;
+      }
+    }
+
+    if (initialDirection != null && selectedIndices.length > 1) {
+      Offset lastPos = selectedIndices.last;
+      int dRow = row - lastPos.dx.toInt();
+      int dCol = col - lastPos.dy.toInt();
+      Offset newDirection = Offset(dRow.toDouble(), dCol.toDouble());
+      if (newDirection != initialDirection) return;
+    }
+
+    if (!selectedIndices.contains(newPos)) {
+      setState(() {
+        selectedIndices.add(newPos);
+        currentSelection += grid[row][col];
+        endPoint = Offset(col.toDouble(), row.toDouble());
+      });
+    }
+  }
+
+  void endSelection() {
+    if (words.contains(currentSelection) &&
+        !foundWords.contains(currentSelection)) {
+      setState(() {
+        foundWords.add(currentSelection);
+        wordColors[currentSelection] = correctColor;
+        showLine = true; 
+
+        for (var pos in selectedIndices) {
+          cellColors[pos] = correctColor;
+          lockedCells[pos] = true;
+        }
+
+        if (startPoint != null && endPoint != null) {
+          lines.add(Line(startPoint!, endPoint!));
+        }
+      });
+    } else {
+      setState(() {
+        selectedIndices = [];
+        currentSelection = "";
+        initialDirection = null;
+        showLine = false; 
+      });
+    }
+    startPoint = null;
+    endPoint = null;
+    _controller.reset();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double cellSize = MediaQuery.of(context).size.width / grid.length;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Word Search Game'),
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Wrap(
+              spacing: 8.0,
+              children: words.map((word) {
+                bool isFound = foundWords.contains(word);
+                return Chip(
+                  label: Text(
+                    word,
+                    style:
+                        TextStyle(color: isFound ? Colors.white : Colors.black),
+                  ),
+                  backgroundColor: isFound
+                      ? wordColors[word] ?? correctColor
+                      : Colors.grey[200],
+                );
+              }).toList(),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'Current Selection: $currentSelection',
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ),
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return GestureDetector(
+                  onPanStart: (details) {
+                    final row = (details.localPosition.dy ~/ cellSize).toInt();
+                    final col = (details.localPosition.dx ~/ cellSize).toInt();
+                    if (row >= 0 &&
+                        row < grid.length &&
+                        col >= 0 &&
+                        col < grid.length) {
+                      startSelection(row, col);
+                    }
+                  },
+                  onPanEnd: (_) => endSelection(),
+                  onPanUpdate: (details) {
+                    final row = (details.localPosition.dy ~/ cellSize).toInt();
+                    final col = (details.localPosition.dx ~/ cellSize).toInt();
+                    if (row >= 0 &&
+                        row < grid.length &&
+                        col >= 0 &&
+                        col < grid.length) {
+                      updateSelection(row, col);
+                    }
+                  },
+                  child: Stack(
+                    children: [
+                      for (var line in lines)
+                        CustomPaint(
+                          size:
+                              Size(constraints.maxWidth, constraints.maxHeight),
+                          painter: SelectionLinePainter(
+                              line.start, line.end, cellSize),
+                        ),
+                      if (showLine && startPoint != null && endPoint != null)
+                        CustomPaint(
+                          size:
+                              Size(constraints.maxWidth, constraints.maxHeight),
+                          painter: SelectionLinePainter(
+                              startPoint!, endPoint!, cellSize),
+                        ),
+                      GridView.builder(
+                        padding: const EdgeInsets.all(2.0),
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: grid.length,
+                          crossAxisSpacing: 12.0,
+                          mainAxisSpacing: 12.0,
+                        ),
+                        itemCount: grid.length * grid.length,
+                        itemBuilder: (context, index) {
+                          int row = index ~/ grid.length;
+                          int col = index % grid.length;
+                          Offset pos = Offset(row.toDouble(), col.toDouble());
+
+                          return Container(
+                            alignment: Alignment.center,
+                            width: cellSize,
+                            height: cellSize,
+                            decoration: BoxDecoration(
+                              color: lockedCells[pos] == true
+                                  ? cellColors[pos]
+                                  : (selectedIndices.contains(pos)
+                                      ? Colors.green
+                                      : Colors.blue[50]),
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            child: Text(
+                              grid[row][col],
+                              style: const TextStyle(fontSize: 20),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class SelectionLinePainter extends CustomPainter {
+  final Offset startPoint;
+  final Offset endPoint;
+  final double cellSize;
+
+  SelectionLinePainter(this.startPoint, this.endPoint, this.cellSize);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final adjustedStartPoint = Offset(
+      startPoint.dx * cellSize + cellSize / 2,
+      startPoint.dy * cellSize + cellSize / 2,
+    );
+    final adjustedEndPoint = Offset(
+      endPoint.dx * cellSize + cellSize / 2,
+      endPoint.dy * cellSize + cellSize / 2,
+    );
+
+    final linePaint = Paint()
+      ..color = Colors.green
+      ..strokeWidth = 12.0 // Increase line width
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    canvas.drawLine(adjustedStartPoint, adjustedEndPoint, linePaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
+  }
+}
+
+class Line {
+  final Offset start;
+  final Offset end;
+
+  Line(this.start, this.end);
+}

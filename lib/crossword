@@ -1,0 +1,145 @@
+import 'package:flutter/material.dart';
+import 'package:crossword/crossword.dart';
+import 'dart:math';
+
+void main() {
+  runApp(const WordSearchGame());
+}
+
+class WordSearchGame extends StatelessWidget {
+  const WordSearchGame({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      home: SelectWidget(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class SelectWidget extends StatelessWidget {
+  const SelectWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Select Category')),
+      body: Center(
+        child: ElevatedButton(
+          child: const Text('Start Game'),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const GameWidget()),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class GameWidget extends StatefulWidget {
+  const GameWidget({super.key});
+
+  @override
+  _GameWidgetState createState() => _GameWidgetState();
+}
+
+class _GameWidgetState extends State<GameWidget> {
+  final List<String> words = ['BIRD', 'BUG', 'CLOUD', 'DRAGON', 'KITE', 'TIME'];
+  List<String> foundWords = [];
+  final List<List<String>> letters = [
+    ['C', 'P', 'K', 'I', 'T', 'E'],
+    ['L', 'B', 'T', 'I', 'M', 'E'],
+    ['O', 'D', 'I', 'B', 'C', 'M'],
+    ['U', 'A', 'X', 'R', 'U', 'S'],
+    ['D', 'O', 'C', 'E', 'D', 'G'],
+    ['N', 'O', 'G', 'A', 'R', 'D'],
+  ];
+  Map<String, Color> wordColors = {};
+  final List<Color> colorOptions = [Colors.pink, Colors.blue, Colors.yellow];
+  Color getRandomColor() {
+    final random = Random();
+    return colorOptions[random.nextInt(colorOptions.length)];
+  }
+
+  void onWordFound(String word) {
+    if (!foundWords.contains(word)) {
+      setState(() {
+        foundWords.add(word);
+        wordColors[word] = getRandomColor();
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Level 4'),
+        actions: [
+          IconButton(onPressed: () {}, icon: const Icon(Icons.star)),
+          IconButton(onPressed: () {}, icon: const Icon(Icons.shopping_cart)),
+        ],
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'Things That Fly',
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge
+                  ?.copyWith(fontWeight: FontWeight.bold),
+            ),
+          ),
+          Wrap(
+            spacing: 8.0,
+            children: words.map((word) {
+              bool isFound = foundWords.contains(word);
+              return Chip(
+                label: Text(
+                  word,
+                  style:
+                      TextStyle(color: isFound ? Colors.white : Colors.black),
+                ),
+                backgroundColor: isFound
+                    ? wordColors[word] ?? Colors.grey
+                    : Colors.grey[200],
+              );
+            }).toList(),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'Found Words: ${foundWords.join(', ')}',
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ),
+          Expanded(
+            child: Crossword(
+              letters: letters,
+              spacing: const Offset(30, 30),
+              hints: words,
+              textStyle: const TextStyle(
+                color: Colors.black,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+              lineDecoration: const LineDecoration(
+                lineGradientColors: [
+                  [Colors.blue, Colors.black, Colors.red],
+                  [Colors.orange, Colors.black],
+                ],
+                strokeWidth: 8,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
